@@ -15,7 +15,7 @@ const log: debug.IDebugger = debug('app:users-controller');
 class UserController {
     async listUsers(req: express.Request, res: express.Response) {
         const users = await UserService.list(100, 0);
-         res.status(200).send(users);
+        res.status(200).send(users);
     }
 
     async getUserById(req: express.Request, res: express.Response) {

@@ -1,82 +1,72 @@
 import shortid from "shortid";
 import debug from "debug";
-
 import { CreateUserDTO } from "../dto/create.user.dto";
 import { PutUserDTO } from "../dto/put.user.dto";
 import { PatchUserDTO } from "../dto/patch.user.dto";
+import MongooseService from "../../common/service/mongoose.service";
 
 const log: debug.IDebugger = debug("app:in-memory-dao");
 
 class UsersDAO {
-  users: Array<CreateUserDTO> = [];
+  Schema = MongooseService.getMongoose().Schema;
+
+  userSchema = new this.Schema(
+    {
+      _id: String,
+      email: String,
+      password: { type: String, select: false },
+      firstName: String,
+      lastName: String,
+      permissionFlags: Number
+    },
+    { id: false }
+  );
+
+  User = MongooseService.getMongoose().model("User", this.userSchema);
 
   constructor() {
     log("Created new instance of UsersDao");
   }
 
-  async addUser(user: CreateUserDTO) {
-    user.id = shortid.generate();
-    this.users.push(user);
-    return user.id;
-  }
+  async addUser(userFields: CreateUserDTO) {
+    const userId = shortid.generate();
+    const user = new this.User({
+      _id: userId,
+      ...userFields,
+      permissionFlags: 1
+    });
 
-  async getUsers() {
-    return this.users;
-  }
+    await user.save();
+    return userId;
+  };
 
-  async getUserById(userId: string) {
-    return this.users.find((user: { id: string }) => user.id === userId);
-  }
+  async getUserByEmail(email: String) {
+    return this.User.findOne({ email: email }).exec();
+  };
 
-  async putUserById(userId: string, user: PutUserDTO) {
-    const objectIndex = this.users.findIndex(
-      (obj: { id: string }) => obj.id === userId
+  async getUserById(userId: String) {
+    return this.User.findOne({ _id: userId }).populate("User").exec();
+  };
+
+  async getUsers(limit = 25, page = 0) {
+    return this.User.find()
+      .limit(limit)
+      .skip(limit * page)
+      .exec();
+  };
+
+  async updateUserById(userId: string, userFields: PutUserDTO | PatchUserDTO) {
+    const existingUser = await this.User.findOneAndUpdate(
+      { _id: userId },
+      { $set: userFields },
+      { new: true }
     );
-    this.users.splice(objectIndex, 1, user);
-    return `${user.id} was update via put`;
-  }
 
-  async patchUserById(userId: string, user: PatchUserDTO) {
-    const objectIndex = this.users.findIndex(
-      (obj: { id: string }) => obj.id === userId
-    );
-    let currentUser = this.users[objectIndex];
-
-    const allowedPatchFields = [
-      "password",
-      "firstName",
-      "lastName",
-      "permissionLevel"
-    ];
-
-    for (let field of allowedPatchFields) {
-      if (field in user) {
-        // @ts-ignore
-        currentUser[field] = user[field];
-      }
-    }
-
-    this.users.splice(objectIndex, 1, currentUser);
-    return `${user.id} patched`;
+    return existingUser;
   }
 
   async removeUserById(userId: string) {
-    const objectIndex = this.users.findIndex(
-      (user: { id: string }) => user.id === userId
-    );
-    this.users.splice(objectIndex, 1);
-    return `${userId} removed`;
-  }
-
-  async getUserByEmail(email: string) {
-      const objectIndex = this.users.findIndex((user: {email: string}) => user.email === email);
-      const currentUser = this.users[objectIndex];
-
-      if(currentUser) {
-        return currentUser;
-      } else {
-        return null;
-      }
+    return this.User.deleteOne({_id: userId}).exec();
   }
 }
 
