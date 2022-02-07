@@ -1,11 +1,14 @@
 import express from "express";
-import { commonRouteConfig } from "../common/common.routes.config";
+import { CommonRouteConfig } from "../common/common.routes.config";
 import UsersController from "./controllers/users.controller";
 import UsersMiddleware from "./middlewares/users.middleware";
 import BodyValidationMiddleware from "../common/middleware/body.validation.middleware";
 import { body } from "express-validator";
+import JwtMiddleware from "../auth/middleware/jwt.middleware";
+import CommonPermissionMiddleware from "../common/middleware/common.permission.middleware";
+import { PermissionFlag } from "../common/middleware/common.permissionflag.enum";
 
-export class UsersRoutes extends commonRouteConfig {
+export class UsersRoutes extends CommonRouteConfig {
   constructor(app: express.Application) {
     super(app, "UserRoutes");
   }
@@ -13,7 +16,13 @@ export class UsersRoutes extends commonRouteConfig {
   configureRoutes() {
     this.app
       .route("/users")
-      .get(UsersController.listUsers)
+      .get(
+        JwtMiddleware.validJWTNeeded,
+        CommonPermissionMiddleware.permissionFlagRequired(
+          PermissionFlag.ADMIN_PERMISSION
+        ),
+        UsersController.listUsers
+      )
       .post(
         body("email").isEmail(),
         body("password")
@@ -27,12 +36,16 @@ export class UsersRoutes extends commonRouteConfig {
     this.app.param(`userId`, UsersMiddleware.extractUserId);
 
     this.app
-      .route("users/:userId")
-      .all(UsersMiddleware.validateUserExists)
+      .route("/users/:userId")
+      .all(
+        UsersMiddleware.validateUserExists,
+        JwtMiddleware.validJWTNeeded,
+        CommonPermissionMiddleware.onlySameUserOrAdminCanDoThisAction
+      )
       .get(UsersController.getUserById)
       .delete(UsersController.removeUser);
 
-    this.app.put("users/:userId", [
+    this.app.put("/users/:userId", [
       body("email").isEmail(),
       body("password")
         .isLength({ min: 5 })
@@ -42,10 +55,14 @@ export class UsersRoutes extends commonRouteConfig {
       body("permissionFlags").isInt(),
       BodyValidationMiddleware.verifyBodyFieldsErrors,
       UsersMiddleware.validateSameEmailBelongToSameUser,
+      UsersMiddleware.userCantChangePermission,
+      CommonPermissionMiddleware.permissionFlagRequired(
+        PermissionFlag.PAID_PERMISSION
+      ),
       UsersController.put
     ]);
 
-    this.app.patch("users/:userId", [
+    this.app.patch("/users/:userId", [
       body("email").isEmail().optional(),
       body("password")
         .isLength({ min: 5 })
@@ -55,9 +72,13 @@ export class UsersRoutes extends commonRouteConfig {
       body("lastName").isString().optional(),
       body("permissionFlags").isInt().optional(),
       BodyValidationMiddleware.verifyBodyFieldsErrors,
+      UsersMiddleware.userCantChangePermission,
+      CommonPermissionMiddleware.permissionFlagRequired(
+        PermissionFlag.PAID_PERMISSION
+      ),
       UsersController.patch
     ]);
 
     return this.app;
   }
-};
+}

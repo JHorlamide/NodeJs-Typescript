@@ -16,14 +16,14 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const debug_1 = __importDefault(require("debug"));
 const log = (0, debug_1.default)("app:mongoose-service");
 class MongooseService {
+    // private mongooseOptions = {
+    //   useNewUrlParser: true,
+    //   useUnifiedTopology: true,
+    //   serverSelectionTimeoutMS: 5000,
+    //   useFindAndModify: false
+    // };
     constructor() {
         this.count = 0;
-        this.mongooseOptions = {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            serverSelectionTimeoutMS: 5000,
-            useFindAndModify: false
-        };
         this.connectWithRetry();
     }
     getMongoose() {
@@ -33,7 +33,7 @@ class MongooseService {
         return __awaiter(this, void 0, void 0, function* () {
             log("Attempting MongoDB connection (will retry if needed)");
             try {
-                const connectionResult = yield mongoose_1.default.connect("mongodb://localhost:27017/api-db", this.mongooseOptions);
+                const connectionResult = yield mongoose_1.default.connect("mongodb://localhost:27017/api-db");
                 if (connectionResult)
                     log("MongoDB is connected");
             }
@@ -47,4 +47,4 @@ class MongooseService {
     }
 }
 exports.default = new MongooseService();
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibW9uZ29vc2Uuc2VydmljZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9jb21tb24vc2VydmljZS9tb25nb29zZS5zZXJ2aWNlLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7O0FBQUEsd0RBQWdDO0FBQ2hDLGtEQUEwQjtBQUUxQixNQUFNLEdBQUcsR0FBb0IsSUFBQSxlQUFLLEVBQUMsc0JBQXNCLENBQUMsQ0FBQztBQUUzRCxNQUFNLGVBQWU7SUFTbkI7UUFSUSxVQUFLLEdBQUcsQ0FBQyxDQUFDO1FBQ1Ysb0JBQWUsR0FBRztZQUN4QixlQUFlLEVBQUUsSUFBSTtZQUNyQixrQkFBa0IsRUFBRSxJQUFJO1lBQ3hCLHdCQUF3QixFQUFFLElBQUk7WUFDOUIsZ0JBQWdCLEVBQUUsS0FBSztTQUN4QixDQUFDO1FBR0EsSUFBSSxDQUFDLGdCQUFnQixFQUFFLENBQUM7SUFDMUIsQ0FBQztJQUVELFdBQVc7UUFDVCxPQUFPLGtCQUFRLENBQUM7SUFDbEIsQ0FBQztJQUVLLGdCQUFnQjs7WUFDcEIsR0FBRyxDQUFDLHNEQUFzRCxDQUFDLENBQUM7WUFDNUQsSUFBSTtnQkFDRixNQUFNLGdCQUFnQixHQUFHLE1BQU0sa0JBQVEsQ0FBQyxPQUFPLENBQzdDLGtDQUFrQyxFQUNsQyxJQUFJLENBQUMsZUFBZSxDQUNyQixDQUFDO2dCQUVGLElBQUksZ0JBQWdCO29CQUFFLEdBQUcsQ0FBQyxzQkFBc0IsQ0FBQyxDQUFDO2FBQ25EO1lBQUMsT0FBTyxLQUFLLEVBQUU7Z0JBQ2QsTUFBTSxZQUFZLEdBQUcsQ0FBQyxDQUFDO2dCQUN2QixHQUFHLENBQ0QsZ0RBQWdELEVBQUUsSUFBSTtxQkFDbkQsS0FBSyxVQUFVLFlBQVksWUFBWSxFQUMxQyxLQUFLLENBQ04sQ0FBQztnQkFDRixVQUFVLENBQUMsSUFBSSxDQUFDLGdCQUFnQixFQUFFLFlBQVksR0FBRyxJQUFJLENBQUMsQ0FBQzthQUN4RDtRQUNILENBQUM7S0FBQTtDQUNGO0FBRUQsa0JBQWUsSUFBSSxlQUFlLEVBQUUsQ0FBQyJ9
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibW9uZ29vc2Uuc2VydmljZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9jb21tb24vc2VydmljZS9tb25nb29zZS5zZXJ2aWNlLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7O0FBQUEsd0RBQWdDO0FBQ2hDLGtEQUEwQjtBQUUxQixNQUFNLEdBQUcsR0FBb0IsSUFBQSxlQUFLLEVBQUMsc0JBQXNCLENBQUMsQ0FBQztBQUUzRCxNQUFNLGVBQWU7SUFFbkIsOEJBQThCO0lBQzlCLDJCQUEyQjtJQUMzQiw4QkFBOEI7SUFDOUIsb0NBQW9DO0lBQ3BDLDRCQUE0QjtJQUM1QixLQUFLO0lBRUw7UUFSUSxVQUFLLEdBQUcsQ0FBQyxDQUFDO1FBU2hCLElBQUksQ0FBQyxnQkFBZ0IsRUFBRSxDQUFDO0lBQzFCLENBQUM7SUFFRCxXQUFXO1FBQ1QsT0FBTyxrQkFBUSxDQUFDO0lBQ2xCLENBQUM7SUFFSyxnQkFBZ0I7O1lBQ3BCLEdBQUcsQ0FBQyxzREFBc0QsQ0FBQyxDQUFDO1lBQzVELElBQUk7Z0JBQ0YsTUFBTSxnQkFBZ0IsR0FBRyxNQUFNLGtCQUFRLENBQUMsT0FBTyxDQUM3QyxrQ0FBa0MsQ0FDbkMsQ0FBQztnQkFFRixJQUFJLGdCQUFnQjtvQkFBRSxHQUFHLENBQUMsc0JBQXNCLENBQUMsQ0FBQzthQUNuRDtZQUFDLE9BQU8sS0FBSyxFQUFFO2dCQUNkLE1BQU0sWUFBWSxHQUFHLENBQUMsQ0FBQztnQkFDdkIsR0FBRyxDQUNELGdEQUFnRCxFQUFFLElBQUk7cUJBQ25ELEtBQUssVUFBVSxZQUFZLFlBQVksRUFDMUMsS0FBSyxDQUNOLENBQUM7Z0JBQ0YsVUFBVSxDQUFDLElBQUksQ0FBQyxnQkFBZ0IsRUFBRSxZQUFZLEdBQUcsSUFBSSxDQUFDLENBQUM7YUFDeEQ7UUFDSCxDQUFDO0tBQUE7Q0FDRjtBQUVELGtCQUFlLElBQUksZUFBZSxFQUFFLENBQUMifQ==

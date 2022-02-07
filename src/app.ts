@@ -1,17 +1,24 @@
+import dotenv from "dotenv";
+const dotenvResult = dotenv.config();
+if (dotenvResult.error) {
+  throw dotenvResult.error;
+}
+
 import express from "express";
 import * as http from "http";
 
 import * as winston from "winston";
 import * as expressWinston from "express-winston";
 import cors from "cors";
-import { commonRouteConfig } from "./common/common.routes.config";
+import { CommonRouteConfig } from "./common/common.routes.config";
 import { UsersRoutes } from "./users/users.routes.config";
+import { AuthRoutes } from "../src/auth/auth.route.config";
 import debug from "debug";
 
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 const port = 9000;
-const routes: Array<commonRouteConfig> = [];
+const routes: Array<CommonRouteConfig> = [];
 const debugLog: debug.IDebugger = debug("app");
 
 app.use(express.json());
@@ -36,6 +43,7 @@ app.use(expressWinston.logger(loggerOptions));
 // here we are adding the UserRoutes to our array,
 // after sending the Express.js application object to have the routes added to our app!
 routes.push(new UsersRoutes(app));
+routes.push(new AuthRoutes(app));
 
 // this is a simple route to make sure everything is working properly
 const runningMessage = `Server running at http://localhost:${port}`;
@@ -45,7 +53,7 @@ app.get("/", (req: express.Request, res: express.Response) => {
 });
 
 server.listen(port, () => {
-  routes.forEach((route: commonRouteConfig) => {
+  routes.forEach((route: CommonRouteConfig) => {
     debugLog(`Routes configured for ${route.getName()}`);
   });
 

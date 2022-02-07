@@ -1,6 +1,6 @@
 import express from "express";
 
-export abstract class commonRouteConfig {
+export abstract class CommonRouteConfig {
   app: express.Application;
   name: string;
 
