@@ -7,8 +7,8 @@
     "start": "tsc && node --unhandled-rejections=strict ./dist/app.js",
     "debug": "set DEBUG=* && npm run start",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "test": "mocha -r ts-node/register 'test/**/*.test.ts' --unhandled-rejections=strict",
-    "test-debug": "export DEBUG=* && npm test"
+    "test": "mocha -r ts-node/register 'src/test/**/*.test.ts' --unhandled-rejections=strict",
+    "test-debug": "set DEBUG=* && npm test"
   },
   "keywords": [],
   "author": "",

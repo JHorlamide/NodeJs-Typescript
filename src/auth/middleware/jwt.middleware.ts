@@ -34,7 +34,7 @@ class JwtMiddleware {
     const salt = crypto.createSecretKey(
       Buffer.from(res.locals.jwt.refreshKey.data)
     );
-    
+
     const hash = crypto
       .createHmac("sha512", salt)
       .update(res.locals.jwt.userId + jwtSecret)
@@ -68,7 +68,8 @@ class JwtMiddleware {
           next();
         }
       } catch (error) {
-        return res.status(403).send();
+        console.log("******* Authorization error *******");
+        return res.status(403).send({ message: "Unauthorized", error });
       }
     } else {
       return res.status(401).send();

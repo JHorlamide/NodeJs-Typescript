@@ -13,7 +13,12 @@ const log: debug.IDebugger = debug("app:auth-controller");
 
 // @ts-expect-error
 const jwtSecret: string = process.env.JWT_SECRET;
-const tokenExpirationInSeconds = 36000;
+
+// @ts-expect-error
+const tokenExpirationInSeconds: number =
+  process.env.TOKEN_EXPIRATION_IN_SECONDS;
+
+console.log("token expiration", [tokenExpirationInSeconds]);
 
 class AuthController {
   async createJWT(req: express.Request, res: express.Response) {
@@ -24,10 +29,13 @@ class AuthController {
         .createHmac("sha512", salt)
         .update(refreshId)
         .digest("base64");
+
       req.body.refreshKey = salt.export();
+
       const token = jwt.sign(req.body, jwtSecret, {
         expiresIn: tokenExpirationInSeconds
       });
+
       return res.status(201).send({ accessToken: token, refreshKey: hash });
     } catch (error) {
       log("createJWT error: %0", error);
